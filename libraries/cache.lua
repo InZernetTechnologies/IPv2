@@ -1,27 +1,43 @@
 local moduleInformation = {
-	name = "cache",
-	version = "1.0.0",
+    name = "cache",
+    version = "1.0.1",
 }
 
+local cachePath = "/IPv2/"
+
+-- LOCAL UTILITY FUNCTIONS
+local function openCacheFile(name, mode)
+    return fs.open(cachePath .. name, mode)
+end
+
+local function cacheFileExists(name)
+    return fx.exists(cachePath .. name)
+end
+
+local function readCacheData(fileData)
+    if fileData == nil then
+        print("File is nil")
+        return {}
+    else
+        return textutils.unserialize(fileData)
+    end
+end
+
+-- MODULE SPECIFIC FUNCTIONS
 function set(name, data)
-    local fileStream = fs.open("/IPv2/" .. name, "w")
+    local fileStream = openCacheFile(name, "w")
     fileStream.write(textutils.serialize(data))
     fileStream.close()
 end
 
 function get(name)
-    if fs.exists("/IPv2/" .. name) == false then
-        return textutils.unserialize("{}")
+    if not cacheFileExists(name) then
+        return {}
     else
-        local fileStream = fs.open("/IPv2/" .. name, "r")
+        local fileStream = openCacheFile(name, "r")
         local file = fileStream.readAll()
         fileStream.close()
-        if file == nil then
-            print("File is nil")
-            return textutils.unserialize("{}")
-        else
-            return textutils.unserialize(file)
-        end
+        return readCacheData(file)
     end
 end
 
