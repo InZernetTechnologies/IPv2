@@ -91,9 +91,11 @@ function getModuleInformation()
 end
 
 function load()
-	
+    local cache = _G.modules.cache
+    _G.modems = cache.get("modems")
 end
 
 function unload()
-    
+    local cache = _G.modules.cache
+    cache.set("modems", _G.modems)
 end
