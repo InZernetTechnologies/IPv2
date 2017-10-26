@@ -20,11 +20,11 @@ function load_module(_sPath)
     if fnAPI then
         local ok, err = pcall( fnAPI )
         if not ok then
-            printError( err )
+            printError("[libman]: " .. err )
             return false
         end
     else
-        printError( err )
+        printError("[libman]: " .. err )
         return false
     end
     
