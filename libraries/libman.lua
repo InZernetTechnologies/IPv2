@@ -88,9 +88,7 @@ end
 function unloadModule(_sName)
 	if _sName ~= "_G" and type(_G.modules[_sName]) == "table" then
 		-- Call our unload() method
-		_G.moduled[_sName].unload()
-		-- Actually clear it out
-        _G.modules[_sName] = nil
+		_G.modules[_sName].unload()
     end
 end
 
@@ -98,6 +96,13 @@ end
 function init(vmoduleDir)
     moduleDir = vmoduleDir
 	_G.modules = {}
+end
+
+function unload()
+	for k, v in pairs(_G.modules) do
+		unloadModule(k)
+	end
+	_G.modules = nil
 end
 
 -- For every module in /modules (except MM and the example) load it
