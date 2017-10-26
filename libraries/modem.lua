@@ -35,6 +35,36 @@ function getMAC(side)
   end
 end
 
+function openModemWiFi(MAC)
+    print("WiFi on " .. MAC)
+    open(MAC, _G.modems[MAC]["WiFi"]["channel"])
+	for k, v in pairs(_G.modems[MAC]["WiFi"]) do
+		print(tostring(k) .. " >> " .. tostring(v))
+	end
+end
+
+function open(MAC, vlan)
+    peripheral.call(_G.modems[MAC]["side"], "open", vlan)
+end
+
+function generatePassword(length)
+	local code
+	local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	for i = 1, length do
+		local idx = math.random(#validChars)
+		if code == nil then
+			code = validChars:sub(idx,idx)
+		else
+			code = code..validChars:sub(idx,idx)
+		end
+	end
+	return code
+end
+
+function getSSID(side)
+	return "CC" .. os.getComputerID() .. string.upper(string.sub(side,1,2))
+end
+
 function DecToBase(val,base)
 	if val == 0 then return 0 end
 	local b, k, result, d = base or 10, "0123456789ABCDEFGHIJKLMNOPQRSTUVW",""
