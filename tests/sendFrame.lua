@@ -1,6 +1,6 @@
 local goodFrame = {
-    "000000000001",
-    "000000000001",
+    "000000000005",
+    "000000000003",
     2048,
     {
         "this",
@@ -20,3 +20,4 @@ local s = io.read()
 
 local modem = peripheral.wrap(s)
 modem.transmit(1, 1, goodFrame)
+print("Sent!")
