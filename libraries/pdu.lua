@@ -12,11 +12,11 @@ function frameMACCheck(mac)
 end
 
 function frameCheck(frame)
-    if not #packet == 4 then return false end -- Must be a table 6 in length
-    if not (tonumber(packet[3])) then return false end -- Check if Type is a number
+    if not #frame == 4 then return false end -- Must be a table 6 in length
+    if not (tonumber(frame[3])) then return false end -- Check if Type is a number
     if not frameMACCheck(frame[1]) or not frameMACCheck(frame[2]) then return false end -- The frame mac (to/from) must be valid macs
-    if packet[4] == nil or packet[4] == {} then return false end -- Must contain some data
-    return true -- If our packet meets all the criteria
+    if frame[4] == nil or frame[4] == {} then return false end -- Must contain some data
+    return true -- If our frame meets all the criteria
 end
 
 function packetIPCheck(ip)
