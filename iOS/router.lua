@@ -88,12 +88,29 @@ function CLI()
 end
 
 function handler(frame, side, vlan)
-    print(PDU.frame.check(frame))
+    if (not PDU.frameCheck(frame)) then return false end
+    local route = route.getRoute(frame[1])
+    if (route == true) then
+        if (tonumber(frame[3]) == 31)
+            RIP.process(frame[4])
+        end
+        print("Routing to router")
+    else
+        if (route == false) then
+            print("We don't know where it goes, broadcast")
+        else
+            if (type(route) == "string") then
+                print("Route to " .. route)
+            else
+                print("Critial routing error: " .. tostring(route))
+            end
+        end
+    end
 end
 
 -- handles packets
 function modem_listener()
-    while true do
+    while continue do
         local event, side, vlan, returnVlan, frame, distance = os.pullEvent("modem_message")
         handler(frame, side, vlan)
     end
