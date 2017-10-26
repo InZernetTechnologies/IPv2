@@ -75,7 +75,7 @@ function DecToBase(val,base)
 	return result
 end
 
-local function getActiveSides()
+function getActiveSides()
 	local as = {} -- Create empty table
 	for s=1, 6 do -- For each side on the computer: right, back, etc
 		if peripheral.getType(rs.getSides()[s]) == "modem" then -- If something is on that side and it is a modem
