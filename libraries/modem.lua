@@ -106,7 +106,8 @@ end
 function getActiveSides()
 	local as = {} -- Create empty table
 	for s=1, 6 do -- For each side on the computer: right, back, etc
-		if peripheral.getType(rs.getSides()[s]) == "modem" then -- If something is on that side and it is a modem
+        if peripheral.getType(rs.getSides()[s]) == "modem" then -- If something is on that side and it is a modem
+            print("Active: " .. rs.getSides()[s] .. " as " .. peripheral.getType(rs.getSides()[s]))
 			as[rs.getSides()[s]] = peripheral.call(rs.getSides()[s], "isWireless") -- Set the table key to the side and set it to if it's wireless (true = wireless, false = modem)
 		end
 	end
