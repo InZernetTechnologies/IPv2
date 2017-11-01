@@ -3,7 +3,19 @@ local moduleInformation = {
     version = "1.0.0"
 }
 
-function getRoute(MAC)
+function isItForMe(MAC)
+    if (string.upper(MAC) == "FFFFFFFFFFFF") then
+        return true
+    end
+    if (_G.modems[MAC]) then
+            return true
+    end
+end
+
+function getMACRoute(MAC)
+    if (string.upper(MAC) == "FFFFFFFFFFFF") then
+        return true
+    end
     if (_G.routes[MAC] == nil) then
         if (_G.modems[MAC] == nil) then
             return false
@@ -15,7 +27,23 @@ function getRoute(MAC)
     end
     -- TRUE = The Router itself
     -- FALSE = We don't know
-    -- STRING = Send it to this MAC
+    -- STRING = Send out this interface's MAC
+end
+
+
+function addToMACRoute(MAC, modemMAC)
+    if (MAC == "FFFFFFFFFFFF") then -- If it's a boradcast don't add it
+        return false
+    end
+    _G.routes[MAC] = modemMAC
+end
+
+function getIPRoute(IP)
+    if (_G.routes.IP[IP]) then
+        return _G.routes.IP[IP]
+    else
+        return false
+    end
 end
 
 -- REQUIRED MODULE FUNCTIONS
