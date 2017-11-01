@@ -25,15 +25,40 @@ function getSides()
     return sideTable
 end
 
+function broadcastFrame()
+
+end
+
+function broadcastPacket()
+
+end
+
+function broadcastFrameExcept(side, vlan, frame)
+    for MAC, tbl in pairs(_G.modems) do
+        if side ~= tbl.side then
+            print("Broadcasting on " .. MAC .. " [" .. tbl.side .. "]")
+            peripheral.call(tbl.side, "transmit", vlan, vlan, frame)
+        else
+            print("Skipping broadcast on " .. MAC)
+        end
+    end
+end
+
 function getMAC(side)
   if not side then error("No side given",2) end
   side = tostring(side)
   if getSides()[side] then 
-    local macBuffer = tostring(DecToBase(os.computerID() * 6 + getSides()[side],16))
+    local macBuffer = tostring(DecToBase(os.computerID() * 7 + getSides()[side],16))
     local MACaddr = string.rep("0",12-#macBuffer).. macBuffer
     return MACaddr
   end
 end
+
+function getCCID()
+    local macBuffer = tostring(DecToBase(os.computerID() * 7 + 7,16))
+    local MACaddr = string.rep("0",12-#macBuffer).. macBuffer
+    return MACaddr
+  end
 
 function openModemWiFi(MAC)
     print("WiFi on " .. MAC)
