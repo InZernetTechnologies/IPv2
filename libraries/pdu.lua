@@ -3,7 +3,23 @@ local moduleInformation = {
     version = "1.0.0"
 }
 
-function frameMACCheck(mac)
+local trafficClasses = {
+    0,
+    46,
+    10,
+    12,
+    18,
+    20
+}
+
+local nextHeader = {
+    1,
+    3,
+    6,
+    17
+}
+
+function MACCheck(mac)
     if (#mac == 12) then
         return true
     else
