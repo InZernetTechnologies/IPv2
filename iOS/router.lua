@@ -169,8 +169,10 @@ function CLI()
         end
 
         if commands[splitCommand[1]] ~= nil then
-            commands[splitCommand[1]](arguments)
+            local rt = commands[splitCommand[1]](arguments)
             if rt ~= nil then
+                print(rt)
+            end
         else
             printError(tostring(splitCommand[1]) .. ": command not found")
         end
