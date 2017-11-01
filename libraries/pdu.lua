@@ -27,15 +27,7 @@ function MACCheck(mac)
     end
 end
 
-function frameCheck(frame)
-    if not #frame == 4 then return false end -- Must be a table 6 in length
-    if not (tonumber(frame[3])) then return false end -- Check if Type is a number
-    if not frameMACCheck(frame[1]) or not frameMACCheck(frame[2]) then return false end -- The frame mac (to/from) must be valid macs
-    if frame[4] == nil or frame[4] == {} then return false end -- Must contain some data
-    return true -- If our frame meets all the criteria
-end
-
-function packetIPCheck(ip)
+function IPCheck(ip)
     local pIP = {} -- Create blank table
     if ip == nil then return false end -- If it's nil, forget it
     for octect in string.gmatch(ip, "[^.]+") do -- Find the . and put each side of it into a table
@@ -47,13 +39,23 @@ function packetIPCheck(ip)
     return false -- If they're not, welp.
 end
 
+function frameCheck(frame)
+    if frame == nil then return false end
+    if not #frame == 4 then return false end -- Must be a table 4 in length
+    if not (tonumber(frame[3])) then return false end -- Check if Type is a number
+    if not MACCheck(frame[1]) or not MACCheck(frame[2]) then return false end -- The frame mac (to/from) must be valid macs
+    if frame[4] == nil or frame[4] == {} then return false end -- Must contain some data
+    return true -- If our frame meets all the criteria
+end
+
 function packetCheck(packet)
-    if not #packet == 6 then return false end -- Must be a table 6 in length
+    if not #packet == 7 then return false end -- Must be a table 7 in length
     if not (tonumber(packet[1]) == 2) then return false end -- Check IPv2
-    if tonumber(packet[2]) ~= 1 and packet[2] ~= 6 and packet[2] ~= 17 then return false end -- Check ICMP, UDP, or TCP
-    if not (tonumber(packet[3]) >= 1) then return false end -- TTL is greater or equal to 1
-    if not packetIPCheck(packet[4]) or not packetIPCheck(packet[5]) then return false end -- The packet (to/from) must be numbers
-    if packet[6] == nil or packet[6] == {} then return false end -- Must contain some data
+    if not (tonumber(packet[2])) then return false end -- Check traffic class
+    if not tonumber(packet[3]) then return false end -- Check if a number for next header
+    if not (tonumber(packet[4]) >= 1) then return false end -- Hope Limit is greater or equal to 1
+    if not IPCheck(packet[5]) or not IPCheck(packet[6]) then return false end -- The packet (to/from) must be numbers
+    if packet[7] == nil or packet[7] == {} then return false end -- Must contain some data
     return true -- If our packet meets all the criteria
 end
 
