@@ -180,24 +180,26 @@ function CLI()
 end
 
 function handler(frame, side, vlan)
-    if (not PDU.frameCheck(frame)) then return false end
-    local route = route.getRoute(frame[1])
-    if (route == true) then
-        if (tonumber(frame[3]) == 31)
-            RIP.process(frame[4])
-        end
-        print("Routing to router")
-    else
-        if (route == false) then
-            print("We don't know where it goes, broadcast")
+    if frame == nil then
+        log.log("DEBUG", "Frame was nil")
+        return false
+    end
+    if (not PDU.frameCheck(frame)) then log.log("INFO", "The frame was bad") return false end -- If it is a bad frame or not
+
+    route.addToMACRoute(frame[2], modem.getMAC(side)) -- -- We know this mac is from that side. Ignored boradcast
+
+    if (route.isItForMe(frame[1])) then
+        log.log("DEBUG", "Accepting Frame")
+        -- Accepts broadcasts and frames with a MAC of one of the modems, everything else we can ignore.
+        if (tonumber(frame[3]) == 2048) then -- If the Ethernet contains IPv2
+            log.log("DEBUG", "The frame is IPv2")
+            local packet = frame[4] -- Strips the frame
+            if (not PDU.packetCheck(packet)) then log.log("INFO", "We have a bad IPv2 packet") return false end --It's a bad packet
         else
-            if (type(route) == "string") then
-                print("Route to " .. route)
-            else
-                print("Critial routing error: " .. tostring(route))
-            end
+            log.log("DEBUG", "Type is something else: " .. frame[3])
         end
     end
+
 end
 
 -- handles packets
