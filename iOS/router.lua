@@ -77,6 +77,77 @@ local commands = {
         print("Shutting down")
         libman.unload()
         continue = false
+    end,
+    [ "vlan" ] = function(arguments)
+        if #arguments == 0 then
+            return "vlan <interface MAC> <add/remove> <vlan #>"
+        end
+        if _G.modems[arguments[1]] then
+            if not tonumber(arguments[3]) then
+                return "VLAN is not a number"
+            end
+            if arguments[2] == "add" then
+                for k, v in pairs(_G.modems[arguments[1]]["VLAN"]) do
+                    if tonumber(v) == tonumber(arguments[3]) then
+                        return "VLAN " .. v .. " is already on interface " .. arguments[1]
+                    end
+                end
+                table.insert(_G.modems[arguments[1]]["VLAN"], arguments[3])
+            elseif arguments[2] == "remove" then
+                for k, v in pairs(_G.modems[arguments[1]]["VLAN"]) do
+                    if tonumber(v) == tonumber(arguments[3]) then
+                        _G.modems[arguments[1]]["VLAN"][k] = nil
+                        return "Removed VLAN " .. v .. " from interface " .. arguments[1]
+                    end
+                    return "VLAN " .. arguments[3] .. " was not found"
+                end
+            else
+                return "<add/remove>: Got " .. arguments[2]
+            end
+        else
+            return "Modem does not exist"
+        end
+    end,
+    [ "ifconfig" ] = function()
+        for k, v in pairs(_G.modems) do
+            print(k)
+            for name, value in pairs(v) do
+                if name == "VLAN" then
+                    write("     VLANS:")
+                    for _, vlan in pairs(value) do
+                        write(" " .. vlan)
+                    end
+                    print("")
+                end
+            end
+        end
+    end,
+
+    [ "service" ] = function(arguments)
+        if #arguments == 0 then
+            print("service <name> <reload>")
+        end
+
+        if arguments[1] == "network" then
+            if arguments[2] == "reload" then
+                service.network.stop()
+                service.network.start()
+            elseif arguments[2] == "stop" then
+                service.network.stop()
+            elseif arguments[2] == "start" then
+                service.network.start()
+            elseif arguments[2] == "reset" then
+                write("Are you sure you want to reset the network? [Y/n] > ")
+                local opt = io.read()
+                if string.lower(opt) == "y" then
+                    service.network.stop()
+                    _G.modems = {}
+                    service.network.start()
+                else
+                    return "Aborting..."
+                end
+            end
+        end
     end
 }
 
