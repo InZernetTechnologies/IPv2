@@ -68,6 +68,9 @@ function openModemWiFi(MAC)
 	end
 end
 
+function close(MAC, vlan)
+    peripheral.call(_G.modems[MAC]["side"], "close", vlan)
+end
 function open(MAC, vlan)
     peripheral.call(_G.modems[MAC]["side"], "open", vlan)
 end
