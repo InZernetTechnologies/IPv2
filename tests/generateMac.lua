@@ -4,3 +4,4 @@ print("========== MAC TABLE ==========")
 for k, v in ipairs(rs.getSides()) do
     print("[" .. v.. "] >>> [" .. modem.getMAC(v) .. "]")
 end
+print("This computer is >>> " .. modem.getCCID())
