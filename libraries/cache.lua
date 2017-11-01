@@ -47,8 +47,8 @@ function getModuleInformation()
 end
 
 function load()
-    if not fs.exists("/IPv2") then
-        fs.makeDir("/IPv2")
+    if not fs.exists(cachePath) then
+        fs.makeDir(cachePath)
     end
 end
 
