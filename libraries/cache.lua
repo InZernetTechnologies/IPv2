@@ -11,7 +11,7 @@ local function openCacheFile(name, mode)
 end
 
 local function cacheFileExists(name)
-    return fx.exists(cachePath .. name)
+    return fs.exists(cachePath .. name)
 end
 
 local function readCacheData(fileData)
