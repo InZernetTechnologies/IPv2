@@ -170,7 +170,24 @@ local commands = {
                 end
             end
         end
-    end
+    end,
+
+    [ "continue-broadcast" ] = function(arguments)
+        if (#arguments ~= 1) then
+            return "continue-broadcast <on/off/status>"
+        end
+        if arguments[1] == "on" then
+            configuration["continue-broadcast"] = true
+            return "Continue broadcast set to true"
+        elseif arguments[1] == "off" then
+            configuration["continue-broadcast"] = false
+            return "Continue broadcast set to false"
+        elseif arguments[1] == "status" then
+            print("Continue broadcast status: " .. tostring(configuration["continue-broadcast"]))
+        else
+            return "continue-broadcast <on/off/status>"
+        end
+    end,
 }
 
 -- Handles CLI input
