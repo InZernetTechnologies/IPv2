@@ -15,6 +15,9 @@ local PDU = _G.modules.pdu
 local cache = _G.modules.cache
 local route = _G.modules.route
 local log = _G.modules.log
+local ARP = _G.modules.ARP
+
+local configuration, oldPull
 
 local service = {
     [ "network" ] = {
@@ -68,15 +71,34 @@ local service = {
 
 -- Takes care of anything we need to load before startup
 function startup()
+    oldPull = os.pullEvent
+    os.pullEvent = os.pullEventRaw
     service.network.start()
+    configuration = cache.get("configuration")
+    if #configuration == 0 then
+        configuration = generateDefaultConfiguration()
+    end
     parallel.waitForAny(CLI, modem_listener) -- Start CLI() and modem_listener()
+end
+
+function generateDefaultConfiguration()
+    local defaultConfiguration = {
+        [ "continue-broadcast" ] = false,
+    }
+    return defaultConfiguration
+end
+
+function shutdown()
+    print("Shutting down")
+    cache.set("configuration", configuration)
+    libman.unload()
+    continue = false
+    os.pullEvent = oldPull
 end
 
 local commands = {
     [ "exit" ] = function()
-        print("Shutting down")
-        libman.unload()
-        continue = false
+        shutdown()
     end,
     [ "vlan" ] = function(arguments)
         if #arguments == 0 then
