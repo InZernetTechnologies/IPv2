@@ -1,5 +1,5 @@
 local moduleInformation = {
-    name = "RIP",
+    name = "GGP",
     version = "1.0.0"
 }
 
