@@ -229,18 +229,28 @@ function handler(frame, side, vlan)
     end
     if (not PDU.frameCheck(frame)) then log.log("INFO", "The frame was bad") return false end -- If it is a bad frame or not
 
-    route.addToMACRoute(frame[2], modem.getMAC(side)) -- -- We know this mac is from that side. Ignored boradcast
+    route.addToMACRoute(frame[2], modem.getMAC(side)) -- -- We know this mac is from that side. Ignored broadcast
 
+    if (route.isBroadcast(frame[1])) then
+        log.log("DEBUG", "Accepting Broadcast Frame")
+    end
     if (route.isItForMe(frame[1])) then
         log.log("DEBUG", "Accepting Frame")
-        -- Accepts broadcasts and frames with a MAC of one of the modems, everything else we can ignore.
-        if (tonumber(frame[3]) == 2048) then -- If the Ethernet contains IPv2
-            log.log("DEBUG", "The frame is IPv2")
-            local packet = frame[4] -- Strips the frame
-            if (not PDU.packetCheck(packet)) then log.log("INFO", "We have a bad IPv2 packet") return false end --It's a bad packet
-        else
-            log.log("DEBUG", "Type is something else: " .. frame[3])
-        end
+    end
+    -- Accepts broadcasts and frames with a MAC of one of the modems, everything else we can ignore.
+    if (tonumber(frame[3]) == 2048) then -- If the Ethernet contains IPv2
+        log.log("DEBUG", "The frame is IPv2")
+        local packet = frame[4] -- Strips the frame
+        if (not PDU.packetCheck(packet)) then log.log("INFO", "We have a bad IPv2 packet") return false end --It's a bad packet
+    elseif (tonumber(frame[3]) == 2054) then
+        log.log("DEBUG", "The frame is ARP")
+
+    else
+        log.log("DEBUG", "Type is something else: " .. frame[3])
+    end
+
+    if (route.isBroadcast(frame[1]) and configuration["continue-broadcast"]) then
+        modem.broadcastFrameExcept(side, vlan, frame)
     end
 
 end
