@@ -214,6 +214,10 @@ function CLI()
             end
         else
             printError(tostring(splitCommand[1]) .. ": command not found")
+            print("Available commands:")
+            for k, _ in pairs(commands) do
+                print("     " .. k)
+            end
         end
     end
 end
