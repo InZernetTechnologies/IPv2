@@ -258,8 +258,12 @@ end
 -- handles packets
 function modem_listener()
     while continue do
-        local event, side, vlan, returnVlan, frame, distance = os.pullEvent("modem_message")
-        handler(frame, side, vlan)
+        local event, side, vlan, returnVlan, frame, distance = os.pullEventRaw()
+        if event == "modem_message" then
+            handler(frame, side, vlan)
+        elseif event == "terminate" then
+            shutdown()
+        end
     end
 end
 
