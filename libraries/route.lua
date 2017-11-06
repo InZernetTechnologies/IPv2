@@ -3,12 +3,17 @@ local moduleInformation = {
     version = "1.0.0"
 }
 
-function isItForMe(MAC)
+function isBroadcast(MAC)
     if (string.upper(MAC) == "FFFFFFFFFFFF") then
         return true
+    else
+        return false
     end
+end
+
+function isItForMe(MAC)
     if (_G.modems[MAC]) then
-            return true
+        return true
     end
 end
 
