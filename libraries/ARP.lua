@@ -18,8 +18,8 @@ function get(KEY)
 end
 
 function isGood(packet)
-    if (packet[1] == nil) return false end
-    if (packet[2] == nil) return false end
+    if (packet[1] == nil) then return false end
+    if (packet[2] == nil) then return false end
     return true
 end
 
