@@ -1,6 +1,6 @@
 local moduleInformation = {
-	name = "modem",
-    version = "1.0.0",
+    name = "modem",
+    version = "1.0.1",
     dependencies = {
         [ "cache" ] = "cache.lua"
     }
@@ -21,12 +21,27 @@ local sideTable = {
     [ "left" ] = 6
 }
 
+-- LOCAL UTILITY FUNCTIONS
+local function getMacBuffer(offset)
+    return tostring(DecToBase(os.computerID()*7 + offset, 16))
+end
+
+local function getMacAddr(macBuffer)
+    return string.rep("0", 12 - #macBuffer) .. macBuffer
+end
+
+local function hasModem(side)
+    return peripheral.getType(rs.getSides()[side]) == "modem"
+end
+
+-- MODULE SPECIFIC FUNCTIONS
 function getSides()
     return sideTable
 end
 
-function broadcastFrame()
-
+function broadcastFrame(side, vlan, frame, mac)
+    print("Broadcasting on " .. mac .. " [" .. side .. "]")
+    peripheral.call(side, "transmit", vlan, vlan, frame)
 end
 
 function broadcastPacket()
@@ -36,8 +51,7 @@ end
 function broadcastFrameExcept(side, vlan, frame)
     for MAC, tbl in pairs(_G.modems) do
         if side ~= tbl.side then
-            print("Broadcasting on " .. MAC .. " [" .. tbl.side .. "]")
-            peripheral.call(tbl.side, "transmit", vlan, vlan, frame)
+            broadcastFrame(tbl.side, vlan, frame, MAC)
         else
             print("Skipping broadcast on " .. MAC)
         end
@@ -45,73 +59,70 @@ function broadcastFrameExcept(side, vlan, frame)
 end
 
 function getMAC(side)
-  if not side then error("No side given",2) end
-  side = tostring(side)
-  if getSides()[side] then 
-    local macBuffer = tostring(DecToBase(os.computerID() * 7 + getSides()[side],16))
-    local MACaddr = string.rep("0",12-#macBuffer).. macBuffer
-    return MACaddr
-  end
+    if not side then error("No side given", 2) end
+    side = tostring(side)
+    if getSides()[side] then 
+        return getMacAddr(getMacBuffer(sideTable[side]))
+    end
 end
 
 function getCCID()
-    local macBuffer = tostring(DecToBase(os.computerID() * 7 + 7,16))
-    local MACaddr = string.rep("0",12-#macBuffer).. macBuffer
-    return MACaddr
-  end
+    return getMacAddr(getMacBuffer(7))
+end
 
 function openModemWiFi(MAC)
     print("WiFi on " .. MAC)
     open(MAC, _G.modems[MAC]["WiFi"]["channel"])
-	for k, v in pairs(_G.modems[MAC]["WiFi"]) do
-		print(tostring(k) .. " >> " .. tostring(v))
-	end
+    for k, v in pairs(_G.modems[MAC]["WiFi"]) do
+        print(tostring(k) .. " >> " .. tostring(v))
+    end
 end
 
 function close(MAC, vlan)
     peripheral.call(_G.modems[MAC]["side"], "close", vlan)
 end
+
 function open(MAC, vlan)
     peripheral.call(_G.modems[MAC]["side"], "open", vlan)
 end
 
 function generatePassword(length)
-	local code
-	local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	for i = 1, length do
-		local idx = math.random(#validChars)
-		if code == nil then
-			code = validChars:sub(idx,idx)
-		else
-			code = code..validChars:sub(idx,idx)
-		end
-	end
-	return code
+    local code
+    local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for i = 1, length do
+        local idx = math.random(#validChars)
+        if code == nil then
+            code = validChars:sub(idx, idx)
+        else
+            code = code .. validChars:sub(idx, idx)
+        end
+    end
+    return code
 end
 
 function getSSID(side)
-	return "CC" .. os.getComputerID() .. string.upper(string.sub(side,1,2))
+    return "CC" .. os.getComputerID() .. string.upper(string.sub(side, 1, 2))
 end
 
-function DecToBase(val,base)
-	if val == 0 then return 0 end
-	local b, k, result, d = base or 10, "0123456789ABCDEFGHIJKLMNOPQRSTUVW",""
-	while val > 0 do
-		val, d = math.floor(val/b), math.fmod(val,b)+1
-		result = string.sub(k,d,d)..result
-	end
-	return result
+function DecToBase(val, base)
+    if val == 0 then return 0 end
+    local b, k, result, d = base or 10, "0123456789ABCDEFGHIJKLMNOPQRSTUVW", ""
+    while val > 0 do
+        val, d = math.floor(val / b), math.fmod(val, b) + 1
+        result = string.sub(k, d, d) .. result
+    end
+    return result
 end
 
 function getActiveSides()
-	local as = {} -- Create empty table
-	for s=1, 6 do -- For each side on the computer: right, back, etc
-        if peripheral.getType(rs.getSides()[s]) == "modem" then -- If something is on that side and it is a modem
-            print("Active: " .. rs.getSides()[s] .. " as " .. peripheral.getType(rs.getSides()[s]))
-			as[rs.getSides()[s]] = peripheral.call(rs.getSides()[s], "isWireless") -- Set the table key to the side and set it to if it's wireless (true = wireless, false = modem)
-		end
-	end
-	return as -- Return the table, empty or has entries
+    local activeSides = {}
+    for side = 1, 6 do
+        if hasModem(side) then
+            print("Active: " .. rs.getSides()[side] .. " as " .. peripheral.getType(rs.getSides()[side]))
+            activeSides[rs.getSides()[side]] = peripheral.call(rs.getSides()[side], "isWireless") -- Set the table key to the side and set it to if it's wireless (true = wireless, false = modem)
+        end
+    end
+    return activeSides
 end
 
 -- REQUIRED MODULE FUNCTIONS
