@@ -73,17 +73,17 @@ end
 
 function openModemWiFi(MAC)
     print("WiFi on " .. MAC)
-    open(MAC, _G.modems[MAC]["WiFi"]["channel"])
+    openMAC(MAC, _G.modems[MAC]["WiFi"]["channel"])
     for k, v in pairs(_G.modems[MAC]["WiFi"]) do
         print(tostring(k) .. " >> " .. tostring(v))
     end
 end
 
-function close(MAC, vlan)
+function closeMAC(MAC, vlan)
     peripheral.call(_G.modems[MAC]["side"], "close", vlan)
 end
 
-function open(MAC, vlan)
+function openMAC(MAC, vlan)
     peripheral.call(_G.modems[MAC]["side"], "open", vlan)
 end
 
