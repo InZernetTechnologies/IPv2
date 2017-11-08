@@ -24,16 +24,8 @@ function getVersionFile()
     end
 end
 
-function get(type, subtype)
-	if type == nil then
-		printError("[update]: Type is nil")
-	else
-		if subtype == nil then
-			return version[type]
-		else
-			return version[type][subtype]
-		end
-	end
+function get()
+    return version
 end
 
 -- REQUIRED MODULE FUNCTIONS
