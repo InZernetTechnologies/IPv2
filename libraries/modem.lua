@@ -2,7 +2,8 @@ local moduleInformation = {
     name = "modem",
     version = "1.0.1",
     dependencies = {
-        [ "cache" ] = "cache.lua"
+        [ "cache" ] = "cache.lua",
+        [ "log" ] = "log.lua"
     }
 }
 
