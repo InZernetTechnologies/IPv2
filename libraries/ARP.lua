@@ -17,6 +17,10 @@ function get(KEY)
     end
 end
 
+function getAll()
+    return ARPCache
+end
+
 function isGood(packet)
     if (packet[1] == nil) then return false end
     if (packet[2] == nil) then return false end
