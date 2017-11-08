@@ -5,8 +5,8 @@ local moduleInformation = {
 
 local ARPCache = {}
 
-function set(KEY, VALUE)
-    ARPCache[KEY] = VALUE
+function set(MAC, IP)
+    ARPCache[MAC] = IP
 end
 
 function get(KEY)
