@@ -119,7 +119,7 @@ function getActiveSides()
     local activeSides = {}
     for side = 1, 6 do
         if hasModem(side) then
-            print("Active: " .. rs.getSides()[side] .. " as " .. peripheral.getType(rs.getSides()[side]))
+            _G.modules.log.log("DEBUG", "Active: " .. rs.getSides()[side] .. " as " .. peripheral.getType(rs.getSides()[side]))
             activeSides[rs.getSides()[side]] = peripheral.call(rs.getSides()[side], "isWireless") -- Set the table key to the side and set it to if it's wireless (true = wireless, false = modem)
         end
     end
